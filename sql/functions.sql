@@ -14,6 +14,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- function for result selection
 CREATE OR REPLACE FUNCTION get_order_by_id(order_id_to_find text)
 RETURNS TABLE (
     order_uid text, 
