@@ -18,7 +18,7 @@ type Order struct {
 }
 
 type Delivery struct {
-	Delivery_id int    `json:"delivery_id" validate:"required"`
+	Delivery_id int    `json:"delivery_id"`
 	Name        string `json:"name" validate:"required"`
 	Phone       string `json:"phone" validate:"required"`
 	Zip         string `json:"zip" validate:"required"`
