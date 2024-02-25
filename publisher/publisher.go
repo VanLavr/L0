@@ -30,6 +30,11 @@ func main() {
 				log.Fatal(err)
 			}
 			continue
+		} else if i%15 == 0 {
+			err = sc.Publish("model-channel", GenerateIvalidJSON())
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
 		model := GenerateModel()
@@ -115,5 +120,21 @@ func CastTojson(order model.Order) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return b
+}
+
+func GenerateIvalidJSON() []byte {
+	type A struct {
+		Id   int    `json:"id"`
+		Name string `json:"name"`
+	}
+
+	a := A{Id: rand.Int(), Name: GenerateRandomString()}
+
+	b, err := json.Marshal(a)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return b
 }
