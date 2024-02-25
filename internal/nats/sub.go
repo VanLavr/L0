@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"github.com/VanLavr/L0/internal/delivery/http"
 	"github.com/VanLavr/L0/internal/pkg/config"
 	"github.com/VanLavr/L0/model"
 	"github.com/go-playground/validator/v10"
@@ -16,6 +17,7 @@ type Handler struct {
 	NatsURL   string
 	sc        stan.Conn
 	sub       stan.Subscription
+	srvc      http.Service
 }
 
 func New(name, clusterid, natsurl string) *Handler {
@@ -64,4 +66,12 @@ func (h *Handler) handleMessage(m *stan.Msg) {
 		slog.Info("validation failed")
 		return
 	}
+
+	id, err := h.srvc.SaveOrder(&order)
+	if err != nil {
+		slog.Error(err.Error())
+		return
+	}
+
+	slog.Info("order stored with id: " + id)
 }

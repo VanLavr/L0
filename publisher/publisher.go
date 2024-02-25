@@ -23,7 +23,7 @@ func main() {
 	defer sc.Close()
 
 	// Publish a message
-	for i := 0; ; i++ {
+	for i := 0; i < 1; i++ {
 		if i%10 == 0 {
 			err = sc.Publish("model-channel", []byte("invalid message"))
 			if err != nil {
