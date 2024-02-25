@@ -92,7 +92,6 @@ func GenerateModel() model.Order {
 
 func GenerateRandomItem() model.Item {
 	return model.Item{
-		Chrt_id:      rand.Int(),
 		Track_number: GenerateRandomString(),
 		Price:        rand.Float32(),
 		Rid:          GenerateRandomString(),

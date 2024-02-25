@@ -122,8 +122,8 @@ func (p *postgres) saveItems(items ...model.Item) {
 
 func (p *postgres) saveItem(item model.Item) error {
 	if _, err := p.db.Exec(context.Background(), fmt.Sprintf(`
-	insert into items (chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status)
-	values (%d, %s, %f, %s, %s, %f, %s, %f, %d, %s, %d)`, item.Chrt_id, item.Track_number, item.Price, item.Rid, item.Name, item.Sale, item.Size, item.Total_Price, item.Nm_id, item.Brand, item.Status)); err != nil {
+	insert into items (track_number, price, rid, name, sale, size, total_price, nm_id, brand, status)
+	values (%s, %f, %s, %s, %f, %s, %f, %d, %s, %d)`, item.Track_number, item.Price, item.Rid, item.Name, item.Sale, item.Size, item.Total_Price, item.Nm_id, item.Brand, item.Status)); err != nil {
 		return err
 	}
 
