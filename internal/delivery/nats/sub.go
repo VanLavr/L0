@@ -12,16 +12,13 @@ import (
 )
 
 type Handler struct {
-	Name      string
-	ClusterID string
-	NatsURL   string
-	sc        stan.Conn
-	sub       stan.Subscription
-	srvc      http.Service
+	sc   stan.Conn
+	sub  stan.Subscription
+	srvc http.Service
 }
 
-func New(name, clusterid, natsurl string) *Handler {
-	return &Handler{Name: name, ClusterID: clusterid, NatsURL: natsurl}
+func New(sv http.Service) *Handler {
+	return &Handler{srvc: sv}
 }
 
 func (h *Handler) Connect(cfg *config.Config) {

@@ -28,8 +28,8 @@ type Cache interface {
 	Delete(key string) error
 }
 
-func New() http.Service {
-	return &service{}
+func New(repo Repository) http.Service {
+	return &service{repo: repo}
 }
 
 func (s *service) SaveOrder(order *model.Order) (string, error) {

@@ -6,17 +6,22 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/VanLavr/L0/internal/nats"
+	"github.com/VanLavr/L0/internal/delivery/nats"
 	"github.com/VanLavr/L0/internal/pkg/config"
 	"github.com/VanLavr/L0/internal/pkg/logging"
+	"github.com/VanLavr/L0/internal/repo"
+	"github.com/VanLavr/L0/internal/service"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	h := new(nats.Handler)
 	cfg := config.New()
+	db := repo.NewPostgres(cfg)
+	sv := service.New(db)
+	h := nats.New(sv)
+
 	logger := logging.New(cfg)
 	logger.SetAsDefault()
 

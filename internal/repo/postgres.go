@@ -17,7 +17,7 @@ type postgres struct {
 	conn string
 }
 
-func NewPostgres(cfg config.Config) service.Repository {
+func NewPostgres(cfg *config.Config) service.Repository {
 	return &postgres{conn: cfg.PostgresConnection}
 }
 
