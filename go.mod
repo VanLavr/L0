@@ -4,6 +4,7 @@ go 1.22.0
 
 require (
 	github.com/go-playground/validator/v10 v10.18.0
+	github.com/joho/godotenv v1.5.1
 	github.com/nats-io/stan.go v0.10.4
 )
 
