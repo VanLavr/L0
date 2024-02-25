@@ -57,6 +57,25 @@ func (p *postgres) SaveOrder(order *model.Order) {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
+
+	p.saveOrderItems(order.Items, order.Order_uid)
+}
+
+func (p *postgres) saveOrderItems(items []model.Item, orderUID string) {
+	for _, item := range items {
+		if err := p.saveOrderItem(item, orderUID); err != nil {
+			slog.Error(err.Error())
+			os.Exit(1)
+		}
+	}
+}
+
+func (p *postgres) saveOrderItem(item model.Item, orderUID string) error {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into items_to_orders (order_uid, chrt_id) values (%s, %d)", orderUID, item.Chrt_id)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *postgres) saveOrder(order *model.Order, deliveryID int) error {
