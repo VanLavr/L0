@@ -11,7 +11,7 @@ type service struct{}
 
 type Repository interface {
 	GenerateTrackNumber() string
-	SaveOrder(*model.Order) string
+	SaveOrder(*model.Order)
 	GetOrder(string) (*model.Order, error)
 	Connect(string) error
 }
