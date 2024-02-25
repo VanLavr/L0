@@ -36,6 +36,6 @@ func New(cfg *config.Config) *Logger {
 	}
 }
 
-func SetLogger(l *Logger) {
+func (l *Logger) SetAsDefault() {
 	slog.SetDefault(l.l)
 }

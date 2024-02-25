@@ -38,7 +38,7 @@ func (h *Handler) CloseConnection() {
 }
 
 func (h *Handler) Subscribe(cfg *config.Config) {
-	sub, err := h.sc.Subscribe(cfg.SubjName, h.HandleMessage)
+	sub, err := h.sc.Subscribe(cfg.SubjName, h.handleMessage)
 	if err != nil {
 		slog.Debug(err.Error())
 	}
@@ -51,15 +51,17 @@ func (h *Handler) Unsubscribe() {
 	}
 }
 
-func (h *Handler) HandleMessage(m *stan.Msg) {
+func (h *Handler) handleMessage(m *stan.Msg) {
 	var order model.Order
 	err := json.Unmarshal(m.Data, &order)
 	if err != nil {
 		slog.Warn(err.Error())
+		return
 	}
 
 	err = validator.New().Struct(order)
 	if err != nil {
-		slog.Info(err.Error())
+		slog.Info("validation failed")
+		return
 	}
 }
