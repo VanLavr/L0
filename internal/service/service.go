@@ -15,8 +15,8 @@ type Repository interface {
 }
 
 type Cache interface {
-	Set(key string, value any, duration time.Duration)
-	Get(key string) any
+	Set(key string, value model.Order, duration time.Duration)
+	Get(key string) (model.Order, error)
 	Delete(key string) error
 }
 
@@ -29,5 +29,9 @@ func (s *service) SaveOrder(*model.Order) (string, error) {
 }
 
 func (s *service) GetOrder(string) *model.Order {
+	panic("not implemented")
+}
+
+func (s *service) GetOrderIds() []string {
 	panic("not implemented")
 }

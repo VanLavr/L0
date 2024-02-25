@@ -7,4 +7,5 @@ type HttpHandler struct{}
 type Service interface {
 	SaveOrder(*model.Order) (string, error)
 	GetOrder(string) *model.Order
+	GetOrderIds() []string
 }
