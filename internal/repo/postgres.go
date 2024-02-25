@@ -52,6 +52,22 @@ func (p *postgres) SaveOrder(order *model.Order) {
 	}
 
 	p.saveItems(order.Items...)
+
+	if err = p.saveOrder(order, delID); err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+}
+
+func (p *postgres) saveOrder(order *model.Order, deliveryID int) error {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf(`
+	insert into orders (order_uid, track_number, entr, delivery_id, t_action, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard)
+	values (%s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %d, %s, %s)`,
+		order.Order_uid, order.Track_number, order.Entry, deliveryID, order.P.Transaction, order.Locale, order.Internal_signature, order.Customer_id, order.Delivery_service, order.Shardkey, order.Sm_id, order.Date_created, order.Oof_shard)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *postgres) savePayment(pay model.Payment) error {
