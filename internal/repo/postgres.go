@@ -1,6 +1,10 @@
 package repo
 
 import (
+	"context"
+	"log/slog"
+	"os"
+
 	"github.com/VanLavr/L0/internal/pkg/config"
 	"github.com/VanLavr/L0/internal/service"
 	"github.com/VanLavr/L0/model"
@@ -17,7 +21,21 @@ func NewPostgres(cfg config.Config) service.Repository {
 }
 
 func (p *postgres) GenerateTrackNumber() string {
-	panic("not implemented")
+	row, err := p.db.Query(context.Background(), "select * from generate_unique_id()")
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+
+	defer row.Close()
+
+	var trackNumber string
+	row.Next()
+	if err := row.Scan(&trackNumber); err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+	return trackNumber
 }
 
 func (p *postgres) SaveOrder(*model.Order) string {
@@ -29,5 +47,11 @@ func (p *postgres) GetOrder(string) (*model.Order, error) {
 }
 
 func (p *postgres) Connect(string) error {
-	panic("not implemented")
+	db, err := pgx.Connect(context.Background(), p.conn)
+	if err != nil {
+		return err
+	}
+
+	p.db = db
+	return nil
 }
