@@ -41,6 +41,8 @@ func (c *cache) Set(key string, value model.Order, duration time.Duration) {
 
 	if duration > 0 {
 		exp = time.Now().Add(duration).UnixNano()
+	} else {
+		exp = int64(c.defaultExpiration)
 	}
 
 	c.Lock()
@@ -85,14 +87,15 @@ func (c *cache) Delete(key string) error {
 }
 
 func (c *cache) startGC() {
-	go c.GC()
+	go c.gc()
 }
 
-func (c *cache) GC() {
+func (c *cache) gc() {
 	for {
 		<-time.After(c.cacheEviction)
 		if c.items == nil {
 			return
+			// continue mb
 		}
 
 		if keys := c.expiredKeys(); len(keys) != 0 {
