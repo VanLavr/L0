@@ -8,11 +8,12 @@ import (
 )
 
 type Config struct {
-	Environment string
-	NatsUrl     string
-	ClusterID   string
-	SubName     string
-	SubjName    string
+	Environment        string
+	NatsUrl            string
+	ClusterID          string
+	SubName            string
+	SubjName           string
+	PostgresConnection string
 }
 
 func New() *Config {
@@ -21,10 +22,11 @@ func New() *Config {
 	}
 
 	return &Config{
-		Environment: os.Getenv("ENV"),
-		NatsUrl:     os.Getenv("NATS_URL"),
-		ClusterID:   os.Getenv("CLUSTER"),
-		SubName:     os.Getenv("SUB_NAME"),
-		SubjName:    os.Getenv("SUBJ"),
+		Environment:        os.Getenv("ENV"),
+		NatsUrl:            os.Getenv("NATS_URL"),
+		ClusterID:          os.Getenv("CLUSTER"),
+		SubName:            os.Getenv("SUB_NAME"),
+		SubjName:           os.Getenv("SUBJ"),
+		PostgresConnection: os.Getenv("POSTGRES"),
 	}
 }

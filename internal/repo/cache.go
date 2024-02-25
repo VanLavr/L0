@@ -10,7 +10,7 @@ import (
 )
 
 type item struct {
-	Order          model.Order
+	Order          *model.Order
 	ExpirationTime int64
 	Created        time.Time
 }
@@ -22,7 +22,7 @@ type cache struct {
 	items             map[string]item
 }
 
-func New(defaultExpiration, cacheEviction time.Duration) service.Cache {
+func NewCache(defaultExpiration, cacheEviction time.Duration) service.Cache {
 	c := cache{
 		defaultExpiration: defaultExpiration,
 		cacheEviction:     cacheEviction,
@@ -36,7 +36,7 @@ func New(defaultExpiration, cacheEviction time.Duration) service.Cache {
 	return &c
 }
 
-func (c *cache) Set(key string, value model.Order, duration time.Duration) {
+func (c *cache) Set(key string, value *model.Order, duration time.Duration) {
 	var exp int64
 
 	if duration > 0 {
@@ -55,18 +55,18 @@ func (c *cache) Set(key string, value model.Order, duration time.Duration) {
 	}
 }
 
-func (c *cache) Get(key string) (model.Order, error) {
+func (c *cache) Get(key string) (*model.Order, error) {
 	c.RLock()
 	defer c.RUnlock()
 
 	item, ok := c.items[key]
 	if !ok {
-		return model.Order{}, err.ErrNotFound
+		return nil, err.ErrNotFound
 	}
 
 	if item.ExpirationTime > 0 {
 		if time.Now().UnixNano() > item.ExpirationTime {
-			return model.Order{}, err.ErrNotFound
+			return nil, err.ErrNotFound
 		}
 	}
 

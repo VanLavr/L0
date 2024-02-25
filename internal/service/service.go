@@ -10,13 +10,15 @@ import (
 type service struct{}
 
 type Repository interface {
+	GenerateTrackNumber() string
 	SaveOrder(*model.Order) string
-	GetOrder(string) *model.Order
+	GetOrder(string) (*model.Order, error)
+	Connect(string) error
 }
 
 type Cache interface {
-	Set(key string, value model.Order, duration time.Duration)
-	Get(key string) (model.Order, error)
+	Set(key string, value *model.Order, duration time.Duration)
+	Get(key string) (*model.Order, error)
 	Delete(key string) error
 }
 
