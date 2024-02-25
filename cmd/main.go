@@ -19,6 +19,7 @@ func main() {
 
 	cfg := config.New()
 	db := repo.NewPostgres(cfg)
+	db.Connect()
 	sv := service.New(db)
 	h := nats.New(sv)
 

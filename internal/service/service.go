@@ -19,7 +19,7 @@ type Repository interface {
 	GenerateTrackNumber() string
 	SaveOrder(*model.Order)
 	GetOrder(string) (*model.Order, error)
-	Connect(string) error
+	Connect() error
 }
 
 type Cache interface {
@@ -49,8 +49,8 @@ func (s *service) validate(order *model.Order) error {
 		return err.ErrEmptyItems
 	}
 
-	tp := reflect.TypeOf(order)
-	value := reflect.ValueOf(order)
+	tp := reflect.TypeOf(*order)
+	value := reflect.ValueOf(*order)
 
 	for i := 0; i < tp.NumField(); i++ {
 		if value.Field(i).IsZero() {

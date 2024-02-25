@@ -101,10 +101,7 @@ func (p *postgres) savePayment(pay model.Payment) error {
 
 func (p *postgres) saveDelivery(del model.Delivery) (int, error) {
 	var delID int
-	if err := p.db.QueryRow(context.Background(), fmt.Sprintf(`
-	insert into delivery (name, phone, zip, city, address, region, email) 
-	values (%s, %s, %s, %s, %s, %s) 
-	returning delivery_id`, del.Name, del.Phone, del.Zip, del.City, del.Address, del.Email)).Scan(&delID); err != nil {
+	if err := p.db.QueryRow(context.Background(), fmt.Sprintf("insert into delivery (name, phone, zip, city, address, region, email) values (\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\") returning delivery_id", del.Name, del.Phone, del.Zip, del.City, del.Address, del.Email)).Scan(&delID); err != nil {
 		return 0, err
 	}
 
@@ -134,7 +131,7 @@ func (p *postgres) GetOrder(string) (*model.Order, error) {
 	panic("not implemented")
 }
 
-func (p *postgres) Connect(string) error {
+func (p *postgres) Connect() error {
 	db, err := pgx.Connect(context.Background(), p.conn)
 	if err != nil {
 		return err
