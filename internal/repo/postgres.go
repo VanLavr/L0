@@ -71,7 +71,7 @@ func (p *postgres) saveOrderItems(items []model.Item, orderUID string) {
 }
 
 func (p *postgres) saveOrderItem(item model.Item, orderUID string) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into items_to_orders (order_uid, chrt_id) values (%s, %d)", orderUID, item.Chrt_id)); err != nil {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into items_to_orders (order_uid, chrt_id) values (\"%s\", %d)", orderUID, item.Chrt_id)); err != nil {
 		return err
 	}
 
@@ -79,10 +79,7 @@ func (p *postgres) saveOrderItem(item model.Item, orderUID string) error {
 }
 
 func (p *postgres) saveOrder(order *model.Order, deliveryID int) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf(`
-	insert into orders (order_uid, track_number, entr, delivery_id, t_action, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard)
-	values (%s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %d, %s, %s)`,
-		order.Order_uid, order.Track_number, order.Entry, deliveryID, order.P.Transaction, order.Locale, order.Internal_signature, order.Customer_id, order.Delivery_service, order.Shardkey, order.Sm_id, order.Date_created, order.Oof_shard)); err != nil {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into orders (order_uid, track_number, entr, delivery_id, t_action, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard) values (\"%s\", \"%s\", \"%s\", %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, \"%s\", \"%s\")", order.Order_uid, order.Track_number, order.Entry, deliveryID, order.P.Transaction, order.Locale, order.Internal_signature, order.Customer_id, order.Delivery_service, order.Shardkey, order.Sm_id, order.Date_created, order.Oof_shard)); err != nil {
 		return err
 	}
 
@@ -90,9 +87,7 @@ func (p *postgres) saveOrder(order *model.Order, deliveryID int) error {
 }
 
 func (p *postgres) savePayment(pay model.Payment) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf(`
-	insert into payment (t_action, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee) 
-	values (%s, %s, %s, %s, %f, %d, %s, %f, %f, %f)`, pay.Transaction, pay.Request_id, pay.Currency, pay.Provider, pay.Amount, pay.Payment_dt, pay.Bank, pay.Delivery_cost, pay.Goods_total, pay.Custom_fee)); err != nil {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into payment (t_action, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee) values (\"%s\", \"%s\", \"%s\", \"%s\", %f, %d, \"%s\", %f, %f, %f)", pay.Transaction, pay.Request_id, pay.Currency, pay.Provider, pay.Amount, pay.Payment_dt, pay.Bank, pay.Delivery_cost, pay.Goods_total, pay.Custom_fee)); err != nil {
 		return err
 	}
 
@@ -118,9 +113,7 @@ func (p *postgres) saveItems(items ...model.Item) {
 }
 
 func (p *postgres) saveItem(item model.Item) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf(`
-	insert into items (track_number, price, rid, name, sale, size, total_price, nm_id, brand, status)
-	values (%s, %f, %s, %s, %f, %s, %f, %d, %s, %d)`, item.Track_number, item.Price, item.Rid, item.Name, item.Sale, item.Size, item.Total_Price, item.Nm_id, item.Brand, item.Status)); err != nil {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into items (track_number, price, rid, name, sale, size, total_price, nm_id, brand, status) values (\"%s\", %f, \"%s\", \"%s\", %f, \"%s\", %f, %d, \"%s\", %d)", item.Track_number, item.Price, item.Rid, item.Name, item.Sale, item.Size, item.Total_Price, item.Nm_id, item.Brand, item.Status)); err != nil {
 		return err
 	}
 
