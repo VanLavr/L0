@@ -7,12 +7,15 @@ import (
 	"time"
 
 	"github.com/VanLavr/L0/internal/delivery/http"
+	"github.com/VanLavr/L0/internal/pkg/config"
 	"github.com/VanLavr/L0/internal/pkg/err"
 	"github.com/VanLavr/L0/model"
 )
 
 type service struct {
-	repo Repository
+	repo  Repository
+	cache Cache
+	cfg   *config.Config
 }
 
 type Repository interface {
@@ -29,8 +32,8 @@ type Cache interface {
 	Delete(key string) error
 }
 
-func New(repo Repository) http.Service {
-	return &service{repo: repo}
+func New(repo Repository, cache Cache) http.Service {
+	return &service{repo: repo, cache: cache}
 }
 
 func (s *service) SaveOrder(order *model.Order) (string, error) {
@@ -42,6 +45,7 @@ func (s *service) SaveOrder(order *model.Order) (string, error) {
 	}
 
 	s.repo.SaveOrder(order)
+	s.cache.Set(uuid, order, time.Second*time.Duration(s.cfg.Ttl))
 	return uuid, nil
 }
 
@@ -63,6 +67,11 @@ func (s *service) validate(order *model.Order) error {
 	return nil
 }
 
+// go and fetch data from cache
+// if there is such data in database => respond with this data
+// if there no such data in cache, so
+// go to database and get it
+// than write it to the cache and than => respond with this data
 func (s *service) GetOrder(string) *model.Order {
 	panic("not implemented")
 }

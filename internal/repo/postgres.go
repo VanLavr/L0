@@ -129,7 +129,53 @@ func (p *postgres) saveItem(item model.Item) (int, error) {
 	return id, nil
 }
 
-func (p *postgres) GetOrder(string) (*model.Order, error) {
+func (p *postgres) GetOrder(uid string) (*model.Order, error) {
+	var order model.Order
+
+	row, err := p.db.Query(context.Background(), fmt.Sprintf("select * from orders where order_uid = '%s'", uid))
+	if err != nil {
+		return nil, err
+	}
+
+	for row.Next() {
+		if err := row.Scan(&order.Order_uid, &order.Track_number, &order.Entry, &order.D.Delivery_id, &order.P.Transaction, &order.Locale, &order.Internal_signature, &order.Customer_id, &order.Delivery_service, &order.Shardkey, &order.Sm_id, &order.Date_created, &order.Oof_shard); err != nil {
+			return nil, err
+		}
+	}
+
+	d, err := p.fetchDelivery(order.D.Delivery_id)
+	if err != nil {
+		return nil, err
+	}
+
+	order.D = d
+
+	pm, err := p.fetchPayment(order.P.Transaction)
+	if err != nil {
+		return nil, err
+	}
+
+	order.P = pm
+
+	items, err := p.fetchItems(order.Order_uid)
+	if err != nil {
+		return nil, err
+	}
+
+	order.Items = items
+
+	return nil, nil
+}
+
+func (p *postgres) fetchDelivery(id int) (model.Delivery, error) {
+	panic("not implemented")
+}
+
+func (p *postgres) fetchPayment(trnsctn string) (model.Payment, error) {
+	panic("not implemented")
+}
+
+func (p *postgres) fetchItems(order_uid string) ([]model.Item, error) {
 	panic("not implemented")
 }
 

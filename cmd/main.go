@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/VanLavr/L0/internal/delivery/nats"
 	"github.com/VanLavr/L0/internal/pkg/config"
@@ -20,7 +21,10 @@ func main() {
 	cfg := config.New()
 	db := repo.NewPostgres(cfg)
 	db.Connect()
-	sv := service.New(db)
+
+	c := repo.NewCache(time.Duration(cfg.Ttl), time.Duration(cfg.Eviction))
+
+	sv := service.New(db, c)
 	h := nats.New(sv)
 
 	logger := logging.New(cfg)
