@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 
 	"github.com/VanLavr/L0/internal/pkg/config"
 	"github.com/VanLavr/L0/internal/service"
@@ -51,18 +52,19 @@ func (p *postgres) SaveOrder(order *model.Order) {
 		os.Exit(1)
 	}
 
-	p.saveItems(order.Items...)
+	saved := p.saveItems(order.Items)
 
 	if err = p.saveOrder(order, delID); err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
 
-	p.saveOrderItems(order.Items, order.Order_uid)
+	p.saveOrderItems(saved, order.Order_uid)
 }
 
 func (p *postgres) saveOrderItems(items []model.Item, orderUID string) {
 	for _, item := range items {
+		slog.Debug(strconv.Itoa(item.Chrt_id))
 		if err := p.saveOrderItem(item, orderUID); err != nil {
 			slog.Error(err.Error())
 			os.Exit(1)
@@ -71,7 +73,7 @@ func (p *postgres) saveOrderItems(items []model.Item, orderUID string) {
 }
 
 func (p *postgres) saveOrderItem(item model.Item, orderUID string) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into items_to_orders (order_uid, chrt_id) values (\"%s\", %d)", orderUID, item.Chrt_id)); err != nil {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into items_to_orders (order_uid, chrt_id) values ('%s', %d)", orderUID, item.Chrt_id)); err != nil {
 		return err
 	}
 
@@ -79,7 +81,7 @@ func (p *postgres) saveOrderItem(item model.Item, orderUID string) error {
 }
 
 func (p *postgres) saveOrder(order *model.Order, deliveryID int) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into orders (order_uid, track_number, entr, delivery_id, t_action, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard) values (\"%s\", \"%s\", \"%s\", %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, \"%s\", \"%s\")", order.Order_uid, order.Track_number, order.Entry, deliveryID, order.P.Transaction, order.Locale, order.Internal_signature, order.Customer_id, order.Delivery_service, order.Shardkey, order.Sm_id, order.Date_created, order.Oof_shard)); err != nil {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into orders (order_uid, track_number, entr, delivery_id, t_action, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard) values ('%s', '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s')", order.Order_uid, order.Track_number, order.Entry, deliveryID, order.P.Transaction, order.Locale, order.Internal_signature, order.Customer_id, order.Delivery_service, order.Shardkey, order.Sm_id, order.Date_created, order.Oof_shard)); err != nil {
 		return err
 	}
 
@@ -87,7 +89,7 @@ func (p *postgres) saveOrder(order *model.Order, deliveryID int) error {
 }
 
 func (p *postgres) savePayment(pay model.Payment) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into payment (t_action, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee) values (\"%s\", \"%s\", \"%s\", \"%s\", %f, %d, \"%s\", %f, %f, %f)", pay.Transaction, pay.Request_id, pay.Currency, pay.Provider, pay.Amount, pay.Payment_dt, pay.Bank, pay.Delivery_cost, pay.Goods_total, pay.Custom_fee)); err != nil {
+	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into payment (t_action, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee) values ('%s', '%s', '%s', '%s', %f, %d, '%s', %f, %f, %f)", pay.Transaction, pay.Request_id, pay.Currency, pay.Provider, pay.Amount, pay.Payment_dt, pay.Bank, pay.Delivery_cost, pay.Goods_total, pay.Custom_fee)); err != nil {
 		return err
 	}
 
@@ -96,28 +98,35 @@ func (p *postgres) savePayment(pay model.Payment) error {
 
 func (p *postgres) saveDelivery(del model.Delivery) (int, error) {
 	var delID int
-	if err := p.db.QueryRow(context.Background(), fmt.Sprintf("insert into delivery (name, phone, zip, city, address, region, email) values (\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\") returning delivery_id", del.Name, del.Phone, del.Zip, del.City, del.Address, del.Email)).Scan(&delID); err != nil {
+	if err := p.db.QueryRow(context.Background(), fmt.Sprintf("insert into delivery (name, phone, zip, city, address, region, email) values ('%s', '%s', '%s', '%s', '%s', '%s', '%s') returning delivery_id", del.Name, del.Phone, del.Zip, del.City, del.Address, del.Region, del.Email)).Scan(&delID); err != nil {
 		return 0, err
 	}
 
 	return delID, nil
 }
 
-func (p *postgres) saveItems(items ...model.Item) {
+func (p *postgres) saveItems(items []model.Item) (saved_items []model.Item) {
 	for _, item := range items {
-		if err := p.saveItem(item); err != nil {
+		id, err := p.saveItem(item)
+		if err != nil {
 			slog.Error(err.Error())
 			os.Exit(1)
 		}
+		item.Chrt_id = id
+		saved_items = append(saved_items, item)
 	}
+
+	return
 }
 
-func (p *postgres) saveItem(item model.Item) error {
-	if _, err := p.db.Exec(context.Background(), fmt.Sprintf("insert into items (track_number, price, rid, name, sale, size, total_price, nm_id, brand, status) values (\"%s\", %f, \"%s\", \"%s\", %f, \"%s\", %f, %d, \"%s\", %d)", item.Track_number, item.Price, item.Rid, item.Name, item.Sale, item.Size, item.Total_Price, item.Nm_id, item.Brand, item.Status)); err != nil {
-		return err
+func (p *postgres) saveItem(item model.Item) (int, error) {
+	var id int
+	if err := p.db.QueryRow(context.Background(), fmt.Sprintf("insert into items (track_number, price, rid, name, sale, size, total_price, nm_id, brand, status) values ('%s', %f, '%s', '%s', %f, '%s', %f, %d, '%s', %d) returning chrt_id", item.Track_number, item.Price, item.Rid, item.Name, item.Sale, item.Size, item.Total_Price, item.Nm_id, item.Brand, item.Status)).Scan(&id); err != nil {
+		return 0, err
 	}
 
-	return nil
+	slog.Debug(strconv.Itoa(item.Chrt_id))
+	return id, nil
 }
 
 func (p *postgres) GetOrder(string) (*model.Order, error) {

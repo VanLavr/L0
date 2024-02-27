@@ -74,7 +74,7 @@ func GenerateModel() model.Order {
 			Currency:      GenerateRandomString(),
 			Provider:      GenerateRandomString(),
 			Amount:        rand.Float32(),
-			Payment_dt:    rand.Int(),
+			Payment_dt:    rand.Intn(100000),
 			Bank:          GenerateRandomString(),
 			Delivery_cost: rand.Float32(),
 			Goods_total:   rand.Float32(),
@@ -86,7 +86,7 @@ func GenerateModel() model.Order {
 		Customer_id:        GenerateRandomString(),
 		Delivery_service:   GenerateRandomString(),
 		Shardkey:           GenerateRandomString(),
-		Sm_id:              rand.Int(),
+		Sm_id:              rand.Intn(100000),
 		Date_created:       GenerateRandomString(),
 		Oof_shard:          GenerateRandomString(),
 	}
@@ -101,9 +101,9 @@ func GenerateRandomItem() model.Item {
 		Sale:         rand.Float32(),
 		Size:         GenerateRandomString(),
 		Total_Price:  rand.Float32(),
-		Nm_id:        rand.Int(),
+		Nm_id:        rand.Intn(100000),
 		Brand:        GenerateRandomString(),
-		Status:       rand.Int(),
+		Status:       rand.Intn(100000),
 	}
 }
 
