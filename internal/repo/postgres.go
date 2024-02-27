@@ -133,6 +133,28 @@ func (p *postgres) GetOrder(string) (*model.Order, error) {
 	panic("not implemented")
 }
 
+func (p *postgres) GetIDs() []string {
+	var ids []string
+
+	rows, err := p.db.Query(context.Background(), "select order_uid from orders")
+	if err != nil {
+		slog.Debug(err.Error())
+		os.Exit(1)
+	}
+
+	var id string
+	for rows.Next() {
+		if err := rows.Scan(&id); err != nil {
+			slog.Debug(err.Error())
+			os.Exit(1)
+		}
+
+		ids = append(ids, id)
+	}
+
+	return ids
+}
+
 func (p *postgres) Connect() error {
 	db, err := pgx.Connect(context.Background(), p.conn)
 	if err != nil {

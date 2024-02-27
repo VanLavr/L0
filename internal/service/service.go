@@ -20,6 +20,7 @@ type Repository interface {
 	SaveOrder(*model.Order)
 	GetOrder(string) (*model.Order, error)
 	Connect() error
+	GetIDs() []string
 }
 
 type Cache interface {
@@ -67,5 +68,5 @@ func (s *service) GetOrder(string) *model.Order {
 }
 
 func (s *service) GetOrderIds() []string {
-	panic("not implemented")
+	return s.repo.GetIDs()
 }
