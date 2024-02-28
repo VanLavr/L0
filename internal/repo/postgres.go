@@ -148,14 +148,14 @@ func (p *postgres) GetOrder(uid string) (*model.Order, error) {
 		return nil, err
 	}
 
-	order.D = d
+	order.D = *d
 
 	pm, err := p.fetchPayment(order.P.Transaction)
 	if err != nil {
 		return nil, err
 	}
 
-	order.P = pm
+	order.P = *pm
 
 	items, err := p.fetchItems(order.Order_uid)
 	if err != nil {
@@ -164,19 +164,91 @@ func (p *postgres) GetOrder(uid string) (*model.Order, error) {
 
 	order.Items = items
 
-	return nil, nil
+	return &order, nil
 }
 
-func (p *postgres) fetchDelivery(id int) (model.Delivery, error) {
-	panic("not implemented")
+func (p *postgres) fetchDelivery(id int) (*model.Delivery, error) {
+	var del model.Delivery
+
+	row, err := p.db.Query(context.Background(), fmt.Sprintf("select * from delivery where delivery_id = %d", id))
+	if err != nil {
+		return nil, err
+	}
+
+	for row.Next() {
+		if err := row.Scan(&del.Delivery_id, &del.Name, &del.Phone, &del.Zip, &del.City, &del.Address, &del.Region, &del.Email); err != nil {
+			return nil, err
+		}
+	}
+
+	return &del, nil
 }
 
-func (p *postgres) fetchPayment(trnsctn string) (model.Payment, error) {
-	panic("not implemented")
+func (p *postgres) fetchPayment(trnsctn string) (*model.Payment, error) {
+	var pm model.Payment
+
+	row, err := p.db.Query(context.Background(), fmt.Sprintf("select * from payment where t_action = '%s'", trnsctn))
+	if err != nil {
+		return nil, err
+	}
+
+	for row.Next() {
+		if err := row.Scan(&pm.Transaction, &pm.Request_id, &pm.Currency, &pm.Provider, &pm.Amount, &pm.Payment_dt, &pm.Bank, &pm.Delivery_cost, &pm.Goods_total, &pm.Custom_fee); err != nil {
+			return nil, err
+		}
+	}
+
+	return &pm, nil
 }
 
 func (p *postgres) fetchItems(order_uid string) ([]model.Item, error) {
-	panic("not implemented")
+	var (
+		ids   []int
+		items []model.Item
+	)
+
+	// fetch items id first (from many to many table)
+	rows, err := p.db.Query(context.Background(), fmt.Sprintf("select chrt_id from items_to_orders where order_uid = '%s'", order_uid))
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var id int
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+
+		ids = append(ids, id)
+	}
+
+	// now fetch items with proper ids
+	for _, id := range ids {
+		item, err := p.fetchItemByID(id)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, *item)
+	}
+
+	return items, nil
+}
+
+func (p *postgres) fetchItemByID(id int) (*model.Item, error) {
+	var item model.Item
+
+	row, err := p.db.Query(context.Background(), fmt.Sprintf("select * from items where chrt_id = %d", id))
+	if err != nil {
+		return nil, err
+	}
+
+	for row.Next() {
+		if err := row.Scan(&item.Chrt_id, &item.Track_number, &item.Price, &item.Rid, &item.Name, &item.Sale, &item.Size, &item.Total_Price, &item.Nm_id, &item.Brand, &item.Status); err != nil {
+			return nil, err
+		}
+	}
+
+	return &item, nil
 }
 
 func (p *postgres) GetIDs() []string {

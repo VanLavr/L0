@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"reflect"
 	"time"
 
@@ -72,8 +73,14 @@ func (s *service) validate(order *model.Order) error {
 // if there no such data in cache, so
 // go to database and get it
 // than write it to the cache and than => respond with this data
-func (s *service) GetOrder(string) *model.Order {
-	panic("not implemented")
+func (s *service) GetOrder(id string) *model.Order {
+	order, err := s.repo.GetOrder(id)
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+
+	return order
 }
 
 func (s *service) GetOrderIds() []string {
