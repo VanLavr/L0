@@ -126,3 +126,10 @@ func (s *service) GetOrder(id string) (*model.Order, error) {
 func (s *service) GetOrderIds() []string {
 	return s.repo.GetIDs()
 }
+
+// get the ids from database
+// get all the orders from database with ids
+// set orders to the cache
+func (s *service) RecoveryCache() error {
+	panic("not implemented")
+}

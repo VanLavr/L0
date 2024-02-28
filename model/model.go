@@ -42,7 +42,7 @@ type Payment struct {
 }
 
 type Item struct {
-	Chrt_id      int     `json:"chrt_id" validate:"required"` // set as postgres serial (do not send this data)
+	Chrt_id      int     `json:"chrt_id" validate:"required"` // set as postgres to serial (do not send this data)
 	Track_number string  `json:"track_number" validate:"required"`
 	Price        float32 `json:"price" validate:"required"`
 	Rid          string  `json:"rid" validate:"required"`
