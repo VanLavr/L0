@@ -130,6 +130,30 @@ func (s *service) GetOrderIds() []string {
 // get the ids from database
 // get all the orders from database with ids
 // set orders to the cache
-func (s *service) RecoveryCache() error {
-	panic("not implemented")
+func (s *service) RecoverCache() error {
+	var orders []*model.Order
+
+	// get the ids from database
+	ids := s.GetOrderIds()
+
+	// get all orders from database
+	for _, id := range ids {
+		order, err := s.GetOrder(id)
+		if err != nil {
+			slog.Error(err.Error())
+			return err
+		}
+
+		orders = append(orders, order)
+	}
+
+	// set orders to the cache
+	for _, order := range orders {
+		if err := s.cache.Set(order.Order_uid, order, time.Second*time.Duration(s.cfg.Ttl)); err != nil {
+			slog.Error(err.Error())
+			return err
+		}
+	}
+
+	return nil
 }

@@ -8,5 +8,5 @@ type Service interface {
 	SaveOrder(*model.Order) (string, error)
 	GetOrder(string) (*model.Order, error)
 	GetOrderIds() []string
-	RecoveryCache() error
+	RecoverCache() error
 }
