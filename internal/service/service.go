@@ -55,7 +55,10 @@ func (s *service) SaveOrder(order *model.Order) (string, error) {
 
 	// save
 	s.repo.SaveOrder(order)
-	s.cache.Set(uuid, order, time.Second*time.Duration(s.cfg.Ttl))
+	if err := s.cache.Set(uuid, order, time.Second*time.Duration(s.cfg.Ttl)); err != nil {
+		slog.Error(err.Error())
+		return "", err
+	}
 	return uuid, nil
 }
 
@@ -103,12 +106,14 @@ func (s *service) GetOrder(id string) (*model.Order, error) {
 
 			// write data to the cache
 			if er = s.cache.Set(order.Order_uid, order, time.Second*time.Duration(s.cfg.Ttl)); er != nil {
+				slog.Error(er.Error())
 				return nil, er
 			}
 
 			// return data from database
 			return order, nil
 		} else {
+			slog.Error(er.Error())
 			return nil, er
 		}
 	}
