@@ -8,4 +8,5 @@ var (
 	ErrNotFound           = errors.New("item was not found")
 	ErrEmptyItems         = errors.New("items list should not be empty")
 	ErrInvalidField       = errors.New("non of the fields should be empty")
+	ErrAlreadyExists      = errors.New("such key already exists")
 )

@@ -36,7 +36,11 @@ func NewCache(defaultExpiration, cacheEviction time.Duration) service.Cache {
 	return &c
 }
 
-func (c *cache) Set(key string, value *model.Order, duration time.Duration) {
+func (c *cache) Set(key string, value *model.Order, duration time.Duration) error {
+	if c.isKeyExists(key) {
+		return err.ErrAlreadyExists
+	}
+
 	var exp int64
 
 	if duration > 0 {
@@ -53,6 +57,18 @@ func (c *cache) Set(key string, value *model.Order, duration time.Duration) {
 		ExpirationTime: exp,
 		Created:        time.Now(),
 	}
+
+	return nil
+}
+
+func (c *cache) isKeyExists(key string) bool {
+	for k := range c.items {
+		if k == key {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (c *cache) Get(key string) (*model.Order, error) {

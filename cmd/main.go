@@ -26,7 +26,7 @@ func main() {
 
 	c := repo.NewCache(time.Duration(cfg.Ttl), time.Duration(cfg.Eviction))
 
-	sv := service.New(db, c)
+	sv := service.New(db, c, cfg)
 	h := nats.New(sv)
 
 	logger := logging.New(cfg)
@@ -36,7 +36,11 @@ func main() {
 	h.Subscribe(cfg)
 	slog.Info("listening channel in nats...")
 
-	order := sv.GetOrder("46588f63467744299add4d14fdf27f96")
+	order, err := sv.GetOrder("46588f63467744299add4d14fdf27f96")
+	if err != nil {
+		slog.Debug(err.Error())
+		return
+	}
 	OrderPrinter(*order)
 
 	<-ctx.Done()
