@@ -318,6 +318,17 @@ func (p *postgres) Connect() error {
 		return err
 	}
 
+	slog.Info("connected to postgres")
 	p.db = db
+	return nil
+}
+
+func (p *postgres) CloseConnection() error {
+	if err := p.db.Close(context.Background()); err != nil {
+		slog.Error(err.Error())
+		return err
+	}
+
+	slog.Info("disconnected from postgres")
 	return nil
 }

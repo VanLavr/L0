@@ -19,6 +19,8 @@ type Config struct {
 	PostgresConnection string
 	Eviction           int // seconds
 	Ttl                int // seconds
+	Addr               string
+	Port               string
 }
 
 func New() *Config {
@@ -49,5 +51,7 @@ func New() *Config {
 		PostgresConnection: os.Getenv("POSTGRES"),
 		Eviction:           eviction,
 		Ttl:                t,
+		Addr:               os.Getenv("ADDR"),
+		Port:               os.Getenv("PORT"),
 	}
 }

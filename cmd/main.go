@@ -2,85 +2,71 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/VanLavr/L0/internal/delivery/http"
 	"github.com/VanLavr/L0/internal/delivery/nats"
 	"github.com/VanLavr/L0/internal/pkg/config"
 	"github.com/VanLavr/L0/internal/pkg/logging"
 	"github.com/VanLavr/L0/internal/repo"
 	"github.com/VanLavr/L0/internal/service"
-	"github.com/VanLavr/L0/model"
+	"github.com/labstack/echo/v4"
 )
 
+// implement a graceful shutdown (release all resources?)
+// make a config
+// than initialize repository and database connection
+// than initialize a cache
+// than initialize a service layer
+// init a logger and connection and subsctiption on nats channel
+// initialize an echo instance and than initialize http server
+// than start the http server
 func main() {
+	// gs implementation
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
+	// making an new configuration
 	cfg := config.New()
+
+	// initializing a repository layer and establishing a database connection
 	db := repo.NewPostgres(cfg)
 	db.Connect()
 
+	// initializing cache
 	c := repo.NewCache(time.Duration(cfg.Ttl), time.Duration(cfg.Eviction))
 
+	// init service
 	sv := service.New(db, c, cfg)
+
+	// init nats handler
 	h := nats.New(sv)
 
 	logger := logging.New(cfg)
 	logger.SetAsDefault()
 
+	// connect and subscribe on nats-streaming
 	h.Connect(cfg)
 	h.Subscribe(cfg)
 	slog.Info("listening channel in nats...")
 
-	order, err := sv.GetOrder("46588f63467744299add4d14fdf27f96")
-	if err != nil {
-		slog.Debug(err.Error())
-		return
-	}
-	OrderPrinter(*order)
+	// init an echo instance and http server. Run it
+	e := echo.New()
+	server := http.New(sv)
+	http.RegisterRoutes(e, server)
+	go func() {
+		if err := e.Start(cfg.Addr + ":" + cfg.Port); err != nil {
+			slog.Error(err.Error())
+			os.Exit(1)
+		}
+	}()
 
+	// releasing resources
 	<-ctx.Done()
 	slog.Info("shutting down")
 	h.Unsubscribe()
 	h.CloseConnection()
-}
-
-func OrderPrinter(o model.Order) {
-	fmt.Println("------------------")
-	fmt.Println(o.Order_uid)
-	fmt.Println(o.Track_number)
-	fmt.Println(o.Entry)
-	fmt.Println(o.D.Delivery_id)
-	fmt.Println(o.D.Name)
-	fmt.Println(o.D.Phone)
-	fmt.Println(o.D.Zip)
-	fmt.Println(o.D.City)
-	fmt.Println(o.D.Address)
-	fmt.Println(o.D.Region)
-	fmt.Println(o.D.Email)
-	fmt.Println(o.P.Transaction)
-	fmt.Println(o.P.Request_id)
-	fmt.Println(o.P.Currency)
-	fmt.Println(o.P.Provider)
-	fmt.Println(o.P.Amount)
-	fmt.Println(o.P.Payment_dt)
-	fmt.Println(o.P.Bank)
-	fmt.Println(o.P.Delivery_cost)
-	fmt.Println(o.P.Goods_total)
-	fmt.Println(o.P.Custom_fee)
-	for _, i := range o.Items {
-		fmt.Println(i)
-	}
-	fmt.Println(o.Locale)
-	fmt.Println(o.Internal_signature)
-	fmt.Println(o.Customer_id)
-	fmt.Println(o.Delivery_service)
-	fmt.Println(o.Shardkey)
-	fmt.Println(o.Sm_id)
-	fmt.Println(o.Date_created)
-	fmt.Println(o.Oof_shard)
 }
