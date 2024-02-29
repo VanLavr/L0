@@ -323,12 +323,11 @@ func (p *postgres) Connect() error {
 	return nil
 }
 
-func (p *postgres) CloseConnection() error {
+func (p *postgres) CloseConnection() {
 	if err := p.db.Close(context.Background()); err != nil {
 		slog.Error(err.Error())
-		return err
+		os.Exit(1)
 	}
 
 	slog.Info("disconnected from postgres")
-	return nil
 }

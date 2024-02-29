@@ -80,4 +80,5 @@ func main() {
 	slog.Info("shutting down")
 	h.Unsubscribe()
 	h.CloseConnection()
+	db.CloseConnection()
 }

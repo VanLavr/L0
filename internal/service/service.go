@@ -29,7 +29,7 @@ type Repository interface {
 	GetOrder(string) (*model.Order, error)
 	// connect to postgresql
 	Connect() error
-	CloseConnection() error
+	CloseConnection()
 	GetIDs() []string
 }
 
