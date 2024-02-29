@@ -1,5 +1,6 @@
 package model
 
+// TODO: rewrite notanions to hide redudant data from dto
 type Order struct {
 	Order_uid          string   `json:"order_uid"`
 	Track_number       string   `json:"track_number" validate:"required"`

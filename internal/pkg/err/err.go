@@ -9,4 +9,5 @@ var (
 	ErrEmptyItems         = errors.New("items list should not be empty")
 	ErrInvalidField       = errors.New("non of the fields should be empty")
 	ErrAlreadyExists      = errors.New("such key already exists")
+	ErrInternal           = errors.New("internal server error happend")
 )
