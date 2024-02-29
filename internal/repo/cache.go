@@ -89,6 +89,19 @@ func (c *cache) Get(key string) (*model.Order, error) {
 	return item.Order, nil
 }
 
+func (c *cache) GetAll() []*model.Order {
+	c.RLock()
+	defer c.RUnlock()
+
+	var orders []*model.Order
+
+	for _, item := range c.items {
+		orders = append(orders, item.Order)
+	}
+
+	return orders
+}
+
 func (c *cache) Delete(key string) error {
 	c.Lock()
 	defer c.Unlock()

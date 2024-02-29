@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/VanLavr/L0/internal/delivery/http"
@@ -35,6 +36,7 @@ type Repository interface {
 type Cache interface {
 	Set(key string, value *model.Order, duration time.Duration) error
 	Get(key string) (*model.Order, error)
+	GetAll() []*model.Order
 	Delete(key string) error
 }
 
@@ -134,29 +136,21 @@ func (s *service) GetOrderIds() []string {
 // get all the orders from database with ids
 // set orders to the cache
 func (s *service) RecoverCache() error {
-	var orders []*model.Order
-
 	// get the ids from database
 	ids := s.GetOrderIds()
 
 	// get all orders from database
+	// and the GetOrder function will automatically recover cache and set all the orders to
+	// the cache, because of write-around strategy
 	for _, id := range ids {
-		order, err := s.GetOrder(id)
+		_, err := s.GetOrder(id)
 		if err != nil {
 			slog.Error(err.Error())
 			return err
 		}
-
-		orders = append(orders, order)
 	}
 
-	// set orders to the cache
-	for _, order := range orders {
-		if err := s.cache.Set(order.Order_uid, order, time.Second*time.Duration(s.cfg.Ttl)); err != nil {
-			slog.Error(err.Error())
-			return err
-		}
-	}
+	slog.Debug(strconv.Itoa(len(s.cache.GetAll())))
 
 	return nil
 }

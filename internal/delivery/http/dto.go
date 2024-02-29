@@ -1,6 +1,6 @@
 package http
 
 type Response struct {
-	Error   string `json:"error details"`
+	Error   string `json:"error_details"`
 	Content any    `json:"data"`
 }

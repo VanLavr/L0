@@ -23,28 +23,27 @@ func main() {
 	defer sc.Close()
 
 	// Publish a message
-	for i := 0; i < 1; i++ {
-		/*
-			if i%10 == 0 {
-				err = sc.Publish("model-channel", []byte("invalid message"))
-				if err != nil {
-					log.Fatal(err)
-				}
-				continue
-			} else if i%15 == 0 {
-				err = sc.Publish("model-channel", GenerateIvalidJSON())
-				if err != nil {
-					log.Fatal(err)
-				}
+	for i := 0; ; i++ {
+		if i%10 == 0 {
+			err = sc.Publish("model-channel", []byte("invalid message"))
+			if err != nil {
+				log.Fatal(err)
 			}
-		*/
+			continue
+		} else if i%15 == 0 {
+			err = sc.Publish("model-channel", GenerateIvalidJSON())
+			if err != nil {
+				log.Fatal(err)
+			}
+			continue
+		}
 
 		model := GenerateModel()
 		err = sc.Publish("model-channel", CastTojson(model))
 		if err != nil {
 			log.Fatal(err)
 		}
-		time.Sleep(time.Millisecond * 120)
+		time.Sleep(time.Second * 30)
 		fmt.Println(model)
 	}
 }

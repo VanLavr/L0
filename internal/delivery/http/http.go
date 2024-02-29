@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 
 	er "github.com/VanLavr/L0/internal/pkg/err"
@@ -44,6 +45,7 @@ func (h *HttpHandler) GetIds(c echo.Context) error {
 func (h *HttpHandler) GetOrder(c echo.Context) error {
 	// pars query params
 	id := c.QueryParam("order_uid")
+	slog.Debug(id)
 
 	// find the order with specified id
 	order, err := h.svc.GetOrder(id)
