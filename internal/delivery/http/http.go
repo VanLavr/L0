@@ -7,6 +7,7 @@ import (
 
 	er "github.com/VanLavr/L0/internal/pkg/err"
 	"github.com/VanLavr/L0/model"
+	"github.com/VanLavr/L0/view/layout"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,6 +29,7 @@ func New(svc Service) *HttpHandler {
 func RegisterRoutes(e *echo.Echo, srv *HttpHandler) {
 	e.GET("/order/ids", srv.GetIds)
 	e.GET("/order", srv.GetOrder)
+	e.GET("/", srv.ShowBaseLayout)
 }
 
 // just return the ids
@@ -68,4 +70,8 @@ func (h *HttpHandler) GetOrder(c echo.Context) error {
 		Error:   "",
 		Content: order,
 	})
+}
+
+func (h *HttpHandler) ShowBaseLayout(c echo.Context) error {
+	return Render(c, layout.Show()) 
 }

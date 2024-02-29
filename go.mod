@@ -3,6 +3,7 @@ module github.com/VanLavr/L0
 go 1.22.0
 
 require (
+	github.com/a-h/templ v0.2.590
 	github.com/go-playground/validator/v10 v10.18.0
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/joho/godotenv v1.5.1
