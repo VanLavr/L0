@@ -111,6 +111,7 @@ func (s *service) GetOrder(id string) (*model.Order, error) {
 			}
 
 			// return data from database
+			slog.Info("got data from database")
 			return order, nil
 		} else {
 			slog.Error(er.Error())
@@ -119,6 +120,7 @@ func (s *service) GetOrder(id string) (*model.Order, error) {
 	}
 
 	// return data fetched from cache
+	slog.Info("got data from cache")
 	return data, nil
 }
 
