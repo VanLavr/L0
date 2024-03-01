@@ -1,0 +1,15 @@
+package orders
+
+import "github.com/VanLavr/L0/model"
+import "github.com/VanLavr/L0/view/layout"
+
+templ ShowOrder(order model.Order) {
+    @layout.Show() {
+        <div class="order">
+            <ul>
+                <li class="elem">ID: {order.Order_uid}</li>
+                <li class="elem">Status: {order.Track_number}</li>
+            </ul>
+        </div>
+    }
+}

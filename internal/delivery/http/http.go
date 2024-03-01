@@ -3,11 +3,13 @@ package http
 import (
 	"errors"
 	"log/slog"
-	"net/http"
 
 	er "github.com/VanLavr/L0/internal/pkg/err"
 	"github.com/VanLavr/L0/model"
+	"github.com/VanLavr/L0/view/errorview"
+	IDS "github.com/VanLavr/L0/view/ids"
 	"github.com/VanLavr/L0/view/layout"
+	"github.com/VanLavr/L0/view/orders"
 	"github.com/labstack/echo/v4"
 )
 
@@ -35,10 +37,7 @@ func RegisterRoutes(e *echo.Echo, srv *HttpHandler) {
 // just return the ids
 func (h *HttpHandler) GetIds(c echo.Context) error {
 	ids := h.svc.GetOrderIds()
-	return c.JSON(http.StatusOK, Response{
-		Error:   "",
-		Content: ids,
-	})
+	return Render(c, IDS.ShowIds(ids))
 }
 
 // parse query params
@@ -53,25 +52,16 @@ func (h *HttpHandler) GetOrder(c echo.Context) error {
 	order, err := h.svc.GetOrder(id)
 	if err != nil {
 		if errors.Is(err, er.ErrNotFound) {
-			return c.JSON(http.StatusNotFound, Response{
-				Error:   err.Error(),
-				Content: nil,
-			})
+			return Render(c, errorview.ShowError(err))
 		} else {
-			return c.JSON(http.StatusInternalServerError, Response{
-				Error:   er.ErrInternal.Error(),
-				Content: nil,
-			})
+			return Render(c, errorview.ShowError(err))
 		}
 	}
 
 	// return order
-	return c.JSON(http.StatusFound, Response{
-		Error:   "",
-		Content: order,
-	})
+	return Render(c, orders.ShowOrder(*order))
 }
 
 func (h *HttpHandler) ShowBaseLayout(c echo.Context) error {
-	return Render(c, layout.Show()) 
+	return Render(c, layout.Show())
 }

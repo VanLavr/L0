@@ -66,6 +66,7 @@ func main() {
 
 	// init an echo instance and http server. Run it
 	e := echo.New()
+	e.Static("/static", "static")
 	server := http.New(sv)
 	http.RegisterRoutes(e, server)
 	go func() {

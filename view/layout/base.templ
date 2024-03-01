@@ -3,9 +3,12 @@ package layout
 templ Show() {
 	<html>
 		<head>
+			<link rel="stylesheet" type="text/css" href="../../static/css/style.css"/>
 		</head>
 		<body>
-			<div>Hello from base layout</div>
+			<div class="navbar">
+				{ children... }
+			</div>
 		</body>
 	</html>
 }

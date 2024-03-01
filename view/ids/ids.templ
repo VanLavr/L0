@@ -1,0 +1,15 @@
+package ids
+
+import "github.com/VanLavr/L0/view/layout"
+
+templ ShowIds(ids []string) {
+    @layout.Show() {
+        <div class="ids">
+            <ul>
+                for _, id := range ids {
+                    <li class="elem"><button class="btn">{id}</button></li>
+                }
+            </ul>
+        </div>
+    }
+}
