@@ -1,15 +1,59 @@
 package orders
 
 import "github.com/VanLavr/L0/model"
+import "strconv"
 import "github.com/VanLavr/L0/view/layout"
 
 templ ShowOrder(order model.Order) {
     @layout.Show() {
         <div class="order">
-            <ul>
-                <li class="elem">ID: {order.Order_uid}</li>
-                <li class="elem">Status: {order.Track_number}</li>
-            </ul>
+        <ul>
+            <li class="elem">Order uid: {order.Order_uid}</li>
+            <li class="elem">Track number: {order.Track_number}</li>
+            <li class="elem">Entry: {order.Entry}</li><br/>
+            <li class="elem">Delivery:</li>
+            <li class="elem">Name->{order.D.Name}</li>
+            <li class="elem">Phone->{order.D.Phone}</li>
+            <li class="elem">Zip->{order.D.Zip}</li>
+            <li class="elem">City->{order.D.City}</li>
+            <li class="elem">Address->{order.D.Address}</li>
+            <li class="elem">Region->{order.D.Region}</li>
+            <li class="elem">Email->{order.D.Email}</li><br/>
+            <li class="elem">Payment:</li>
+            <li class="elem">Transaction->{order.P.Transaction}</li>
+            <li class="elem">Request_id->{order.P.Request_id}</li>
+            <li class="elem">Currency->{order.P.Currency}</li>
+            <li class="elem">Provider->{order.P.Provider}</li>
+            <li class="elem">Amount->{strconv.FormatFloat(float64(order.P.Amount), 'g', 2, 32)}</li>
+            <li class="elem">Payment_dt->{strconv.Itoa(order.P.Payment_dt)}</li>
+            <li class="elem">Bank->{order.P.Bank}</li>
+            <li class="elem">Delivery_cost->{strconv.FormatFloat(float64(order.P.Delivery_cost), 'g', 2, 32)}</li>
+            <li class="elem">Goods_total->{strconv.FormatFloat(float64(order.P.Goods_total), 'g', 2, 32)}</li>
+            <li class="elem">Custom_fee->{strconv.FormatFloat(float64(order.P.Custom_fee), 'g', 2, 32)}</li><br/>
+            <li class="elem">Items:</li>
+            for _, item := range order.Items {
+                <li class="elem">-Name: {item.Name}</li>
+                <li class="elem">-Chrt_id: {strconv.Itoa(item.Chrt_id)}</li>
+                <li class="elem">-Track_number: {item.Track_number}</li>
+                <li class="elem">-Price: {strconv.FormatFloat(float64(item.Price), 'g', 2, 32)}</li>
+                <li class="elem">-Rid: {item.Rid}</li>
+                <li class="elem">-Sale: {strconv.FormatFloat(float64(item.Sale), 'g', 2, 32)}</li>
+                <li class="elem">-Size: {item.Size}</li>
+                <li class="elem">-Total_price: {strconv.FormatFloat(float64(item.Total_Price), 'g', 2, 32)}</li>
+                <li class="elem">-Nm_id: {strconv.Itoa(item.Nm_id)}</li>
+                <li class="elem">-Brand: {item.Brand}</li>
+                <li class="elem">-Status: {strconv.Itoa(item.Status)}</li>
+                <li class="elem">----------------------------</li>
+            }
+            <li class="elem">Order locale: {order.Locale}</li>
+            <li class="elem">Internal_signature: {order.Internal_signature}</li>
+            <li class="elem">Customer_id: {order.Customer_id}</li>
+            <li class="elem">D_service: {order.Delivery_service}</li>
+            <li class="elem">Shardkey: {order.Shardkey}</li>
+            <li class="elem">Sm_id: {strconv.Itoa(order.Sm_id)}</li>
+            <li class="elem">Date_created: {order.Date_created}</li>
+            <li class="elem">Oof_shard: {order.Oof_shard}</li>
+        </ul>
         </div>
     }
 }
