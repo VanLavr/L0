@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 
 	er "github.com/VanLavr/L0/internal/pkg/err"
@@ -35,7 +36,12 @@ func RegisterRoutes(e *echo.Echo, srv *HttpHandler) {
 // just return the ids
 func (h *HttpHandler) GetIds(c echo.Context) error {
 	ids := h.svc.GetOrderIds()
-	return Render(c, IDS.ShowIds(ids))
+	var params []string
+	for _, id := range ids {
+		param := fmt.Sprintf("/order?order_uid=%s", id)
+		params = append(params, param)
+	}
+	return Render(c, IDS.ShowIds(ids, params))
 }
 
 // parse query params
