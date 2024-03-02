@@ -43,7 +43,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		time.Sleep(time.Second * 30)
+		time.Sleep(time.Second * 1)
 		fmt.Println(model)
 	}
 }
