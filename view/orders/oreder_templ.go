@@ -33,7 +33,7 @@ func ShowOrder(order model.Order) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"order\"><ul><li class=\"elem\"><button hx-target=\"body\" hx-get=\"/order/ids\" class=\"btn\">Fuck, go back!</button></li><li class=\"elem\">Order uid: ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"order\"><ul><li class=\"elem\"><button hx-target=\"body\" hx-get=\"/order/ids\" class=\"btn\">Go back to ids!</button></li><li class=\"elem\">Order uid: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
