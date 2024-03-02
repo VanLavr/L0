@@ -8,7 +8,7 @@ templ ShowOrder(order model.Order) {
     @layout.Show() {
         <div class="order">
         <ul>
-            <li class="elem"><button hx-target='body' hx-get='/order/ids' class='btn'>Fuck, go back!</button></li>
+            <li class="elem"><button hx-target='body' hx-get='/order/ids' class='btn'>Go back to ids!</button></li>
             <li class="elem">Order uid: {order.Order_uid}</li>
             <li class="elem">Track number: {order.Track_number}</li>
             <li class="elem">Entry: {order.Entry}</li><br/>
